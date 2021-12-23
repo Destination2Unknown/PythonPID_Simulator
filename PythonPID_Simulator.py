@@ -179,7 +179,7 @@ def refresh():
     plant=FOPDTModel(PlantParams, ModelData)
 
     #Start Value
-    PV[0]=ibias=noise[0]
+    PV[0]=ibias+noise[0]
     
     #Loop through timestamps
     for i in t:        
