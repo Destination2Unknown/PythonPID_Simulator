@@ -1,9 +1,7 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 import tkinter as tk
-
 
 def _clamp(value, limits):
     lower, upper = limits
@@ -142,10 +140,10 @@ def refresh():
     #
     
     #Find the size of the range needed
-    if (ideadtime+itau)*2 < 600:
-     rangesize = 600 
-    elif (ideadtime+itau)*2 >7200:
-     rangesize = 7200 
+    if (ideadtime+itau)*2 < minsize:
+     rangesize = minsize
+    elif (ideadtime+itau)*2 >maxsize:
+     rangesize = maxsize
     else:
      rangesize = int((ideadtime+itau)*3)
 
@@ -159,8 +157,9 @@ def refresh():
     pterm = np.zeros(len(t))
     iterm = np.zeros(len(t))
     dterm = np.zeros(len(t))
-    noise= np.random.rand(len(t))
-    noise-=0.5
+    global noise
+    noise=np.resize(noise, len(t))
+    #noise= np.zeros(len(t)) #no noise
     
     #defaults
     ibias=13.115
@@ -181,8 +180,7 @@ def refresh():
 
     #Start Value
     PV[0]=ibias=noise[0]
-    iae=0
-
+    
     #Loop through timestamps
     for i in t:        
         if i<(len(t)-1):
@@ -209,11 +207,10 @@ def refresh():
             pterm[i]=pterm[i-1]
             iterm[i]=iterm[i-1]
             dterm[i]=dterm[i-1]
-        iae+=abs(SP[i]-PV[i])
-        
-    
-    #Display value    
-    iae_text.set(round(iae/len(t),2)) #measure PID performance
+        itae = 0 if i < startofstep else itae+(i-startofstep)*abs(SP[i]-PV[i])
+            
+    #Display itae value    
+    itae_text.set(round(itae/len(t),2)) #measure PID performance
     
     #Plots
     plt.figure()    
@@ -222,19 +219,24 @@ def refresh():
     plt.plot(t,PV,color="red",linewidth=3,label='PV')    
     plt.plot(t,SP, color="blue", linewidth=3, label='SP')
     plt.ylabel('EU')    
-    plt.title('PID')
+    plt.suptitle("ITAE: %s" % round(itae/len(t),2))        
+    plt.title("Kp:%s   Ki:%s  Kd:%s" % (ikp, iki, ikd),fontsize=10)
     plt.legend(loc='best')
 
     plt.subplot(2,1,2)
     plt.plot(t,pterm, color="lime", linewidth=2, label='P Term')
     plt.plot(t,iterm,color="orange",linewidth=2,label='I Term')
-    plt.plot(t,dterm,color="purple",linewidth=2,label='D Term')
+    plt.plot(t,dterm,color="purple",linewidth=2,label='D Term')        
     plt.xlabel('Time [seconds]')
     plt.legend(loc='best')
-    
     plt.show()
 
 #EntryPoint
+#Random Noise between -1 and 1, same set used for each run. Created once at runtime.
+minsize=600
+maxsize=7200
+noise= 2*np.random.rand(minsize)
+noise-=1.5
 
 #Gui
 root = tk.Tk()
@@ -279,9 +281,9 @@ tKi.grid(row=2, column=4)
 tKd.grid(row=3, column=4)
 
 button_calc = tk.Button(root, text="Refresh", command=refresh)
-tk.Label(root, text="IAE:").grid(row=5,column=3)
-iae_text = tk.StringVar()
-tiae=tk.Label(root, textvariable=iae_text).grid(row=5,column=4)
+tk.Label(root, text="itae:").grid(row=5,column=3)
+itae_text = tk.StringVar()
+tk.Label(root, textvariable=itae_text).grid(row=5,column=4)
 
 button_calc.grid(row=5,column=0)
 
