@@ -140,12 +140,12 @@ def refresh():
     #
     
     #Find the size of the range needed
-    if (ideadtime+itau)*2 < minsize:
+    if (ideadtime+itau)*4 < minsize:
      rangesize = minsize
-    elif (ideadtime+itau)*2 >maxsize:
+    elif (ideadtime+itau)*4 >maxsize:
      rangesize = maxsize
     else:
-     rangesize = int((ideadtime+itau)*3)
+     rangesize = int((ideadtime+itau)*4)
 
     #setup time intervals
     t = np.arange(start=0, stop=rangesize, step=1)
@@ -215,9 +215,9 @@ def refresh():
     #Plots
     plt.figure()    
     plt.subplot(2, 1, 1) 
-    plt.plot(t,CV,color="darkgreen",linewidth=3,label='CV')
-    plt.plot(t,PV,color="red",linewidth=3,label='PV')    
-    plt.plot(t,SP, color="blue", linewidth=3, label='SP')
+    plt.plot(t,SP, color="blue", linewidth=2, label='SP')
+    plt.plot(t,CV,color="darkgreen",linewidth=2,label='CV')
+    plt.plot(t,PV,color="red",linewidth=2,label='PV')    
     plt.ylabel('EU')    
     plt.suptitle("ITAE: %s" % round(itae/len(t),2))        
     plt.title("Kp:%s   Ki:%s  Kd:%s" % (ikp, iki, ikd),fontsize=10)
@@ -235,8 +235,8 @@ def refresh():
 #Random Noise between -1 and 1, same set used for each run. Created once at runtime.
 minsize=600
 maxsize=7200
-noise= 2*np.random.rand(minsize)
-noise-=1.5
+noise= np.random.rand(minsize)
+noise-=0.5
 
 #Gui
 root = tk.Tk()
