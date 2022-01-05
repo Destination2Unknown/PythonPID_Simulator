@@ -232,7 +232,7 @@ def refresh():
     plt.show()
 
 #EntryPoint
-#Random Noise between -1 and 1, same set used for each run. Created once at runtime.
+#Random Noise between -0.5 and 0.5, same set used for each run. Created once at runtime.
 minsize=600
 maxsize=7200
 noise= np.random.rand(minsize)
