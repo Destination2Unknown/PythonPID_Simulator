@@ -35,8 +35,9 @@ class PID(object):
         self._derivative = 0
 
         self.output_limits = output_limits
-        self._last_eD =0
-        self._lastCV=0
+        self._last_eD = 0
+        self._lastCV = 0
+        self._d_init = 0
 
         self.reset()
 
@@ -54,6 +55,11 @@ class PID(object):
             #D term
             eD=-PV 
             self._derivative = self.Kd*(eD - self._last_eD)
+
+            #init D term 
+            if self._d_init==0:
+                self._derivative=0
+                self._d_init=1
 
             #Controller Output
             CV = self._proportional + self._integral + self._derivative
