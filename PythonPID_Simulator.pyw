@@ -51,6 +51,11 @@ class PID(object):
             #I Term
             if self._lastCV<100 and self._lastCV >0:        
                 self._integral += self.Ki * e
+            #Allow I Term to change when Kp is set to Zero
+            if self.Kp==0 and self._lastCV==100 and self.Ki * e<0:
+                self._integral += self.Ki * e
+            if self.Kp==0 and self._lastCV==0 and self.Ki * e>0:
+                self._integral += self.Ki * e
 
             #D term
             eD=-PV 
