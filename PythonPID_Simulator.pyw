@@ -10,44 +10,27 @@ import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 import tkinter as tk
 
-def _clamp(value, limits):
-    lower, upper = limits
-    if value is None:
-        return None
-    elif (upper is not None) and (value > upper):
-        return upper
-    elif (lower is not None) and (value < lower):
-        return lower
-    return value
-
-class PID(object):
-    
+class PID(object):    
     def __init__(
         self,
         Kp=1.0,
         Ki=0.1,
         Kd=0.01,
         setpoint=50,
-        output_limits=(0, 100),
-   
+        output_limits=(0, 100),   
     ):
 
         self.Kp, self.Ki, self.Kd = Kp, Ki, Kd
         self.setpoint = setpoint
-
         self._min_output, self._max_output = 0, 100
-
         self._proportional = 0
         self._integral = 0
         self._derivative = 0
-
         self.output_limits = output_limits
         self._last_eD = 0
         self._lastCV = 0
         self._d_init = 0
-
         self.reset()
-
 
     def __call__(self,PV=0,SP=0):
             # PID calculations            
@@ -75,23 +58,19 @@ class PID(object):
 
             #Controller Output
             CV = self._proportional + self._integral + self._derivative
-            CV = _clamp(CV, self.output_limits)
+            CV = self._clamp(CV, self.output_limits)
 
             # update stored data for next iteration
             self._last_eD = eD
             self._lastCV=CV
-
             return CV
         
-
     @property
     def components(self):
-
         return self._proportional, self._integral, self._derivative
 
     @property
     def tunings(self):
-
         return self.Kp, self.Ki, self.Kd
 
     @tunings.setter
@@ -103,52 +82,50 @@ class PID(object):
         return self._min_output, self._max_output
 
     @output_limits.setter
-    def output_limits(self, limits):
-        
+    def output_limits(self, limits):        
         if limits is None:
             self._min_output, self._max_output = 0, 100
             return
-
         min_output, max_output = limits
-
         self._min_output = min_output
         self._max_output = max_output
-
-        self._integral = _clamp(self._integral, self.output_limits)
+        self._integral = self._clamp(self._integral, self.output_limits)
         
-
     def reset(self):
         #Reset
         self._proportional = 0
         self._integral = 0
         self._derivative = 0
-        self._integral = _clamp(self._integral, self.output_limits)
+        self._integral = self._clamp(self._integral, self.output_limits)
         self._last_eD=0
         self._lastCV=0
         self._last_eD =0
         
-class FOPDTModel(object):
-    
-    def __init__(self, PlantParams, ModelData):
-                
-        self.t, self.CV= PlantParams
+    def _clamp(self, value, limits):
+        lower, upper = limits
+        if value is None:
+            return None
+        elif (upper is not None) and (value > upper):
+            return upper
+        elif (lower is not None) and (value < lower):
+            return lower
+        return value
+
+class FOPDTModel(object):    
+    def __init__(self, PlantParams, ModelData):                
+        self.t,self.CV = PlantParams
         self.Gain, self.TimeConstant, self.DeadTime, self.Bias = ModelData
 
-
-    def calc(self,PV,ts):
-                       
-        if (self.t-self.DeadTime) <= 0:
+    def calc(self,PV,ts):                       
+        if (ts-self.DeadTime) <= 0:
             um=0
         else:
-            um=self.CV[self.t-int(self.DeadTime)]
-
+            um=self.CV[int(ts-self.DeadTime)]
         dydt = (-(PV-self.Bias) + self.Gain * um)/self.TimeConstant
         return dydt
 
-    def update(self,PV, ts):
-        
+    def update(self,PV, ts):        
         y=odeint(self.calc,PV,ts)   
-
         return y[-1]
 
 def refresh():
@@ -180,7 +157,7 @@ def refresh():
     #noise= np.zeros(len(t)) #no noise
     
     #defaults
-    ibias=13.115
+    ibias=15
     startofstep=10
 
     #Packup data
@@ -201,8 +178,15 @@ def refresh():
     
     #Loop through timestamps
     for i in t:        
-        if i<(len(t)-1):
-            SP[i] = 0 if i < startofstep else 50 
+        if i<len(t)-1:            
+            if i < startofstep:
+                SP[i] = 0
+            elif (i > startofstep and i< rangesize*0.35):
+                SP[i]= 60 + ibias
+            elif (i > rangesize*0.35 and i< rangesize*0.7):
+                SP[i]= 40 + ibias 
+            else:
+                SP[i]=50 + ibias
             #Find current controller output
             CV[i]=pid(PV[i], SP[i])               
             ts = [t[i],t[i+1]]
@@ -211,11 +195,6 @@ def refresh():
             #Find calculated PV
             PV[i+1] = plant.update(PV[i],ts)
             PV[i+1]+=noise[i]
-            #Limit PV
-            if PV[i+1]>100:
-                PV[i+1]=100
-            if PV[i+1]<ibias:
-                PV[i+1]=ibias
             #Store indiv. terms
             pterm[i],iterm[i],dterm[i]=pid.components
         else:
@@ -306,4 +285,3 @@ tk.Label(root, textvariable=itae_text).grid(row=5,column=4)
 button_calc.grid(row=5,column=0)
 
 root.mainloop()
-
