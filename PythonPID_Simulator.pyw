@@ -132,8 +132,7 @@ def refresh():
     #get values from tkinter 
     igain,itau,ideadtime=float(tK.get()),float(ttau.get()),float(tdt.get())
     ikp,iki,ikd = float(tKp.get()),float(tKi.get()),float(tKd.get())
-    #
-    
+        
     #Find the size of the range needed
     if (ideadtime+itau)*4 < minsize:
      rangesize = minsize
@@ -181,12 +180,10 @@ def refresh():
         if i<len(t)-1:            
             if i < startofstep:
                 SP[i] = 0
-            elif (i > startofstep and i< rangesize*0.35):
+            elif i< rangesize*0.6:
                 SP[i]= 60 + ibias
-            elif (i > rangesize*0.35 and i< rangesize*0.7):
-                SP[i]= 40 + ibias 
             else:
-                SP[i]=50 + ibias
+                SP[i]=40 + ibias
             #Find current controller output
             CV[i]=pid(PV[i], SP[i])               
             ts = [t[i],t[i+1]]
@@ -228,60 +225,60 @@ def refresh():
     plt.legend(loc='best')
     plt.show()
 
-#EntryPoint
-#Random Noise between -0.5 and 0.5, same set used for each run. Created once at runtime.
-minsize=600
-maxsize=7200
-noise= np.random.rand(minsize)
-noise-=0.5
+if __name__ == "__main__":
+    #Random Noise between -0.5 and 0.5, same set used for each run. Created once at runtime.
+    minsize=600
+    maxsize=7200
+    noise= np.random.rand(minsize)
+    noise-=0.5
 
-#Gui
-root = tk.Tk()
-root.title('PID Simulator')
-root.resizable(True, True)
-root.geometry('450x150')
+    #Gui
+    root = tk.Tk()
+    root.title('PID Simulator')
+    root.resizable(True, True)
+    root.geometry('450x150')
 
-#Labels
-tk.Label(root, text=" ").grid(row=0,column=0)
-tk.Label(root, text="FOPDT").grid(row=0,column=1)
-tk.Label(root, text="Model Gain").grid(row=1)
-tk.Label(root, text="Model TimeConstant (s) ").grid(row=2)
-tk.Label(root, text="Model DeadTime (s) ").grid(row=3)
-tk.Label(root, text="                ").grid(row=0,column=2)
-tk.Label(root, text="                ").grid(row=1,column=2)
-tk.Label(root, text="                ").grid(row=2,column=2)
-tk.Label(root, text="                ").grid(row=3,column=2)
-tk.Label(root, text="PID Gains").grid(row=0,column=4)
-tk.Label(root, text="Kp").grid(row=1,column=3)
-tk.Label(root, text="Ki").grid(row=2,column=3)
-tk.Label(root, text="Kd").grid(row=3,column=3)
+    #Labels
+    tk.Label(root, text=" ").grid(row=0,column=0)
+    tk.Label(root, text="FOPDT").grid(row=0,column=1)
+    tk.Label(root, text="Model Gain").grid(row=1)
+    tk.Label(root, text="Model TimeConstant (s) ").grid(row=2)
+    tk.Label(root, text="Model DeadTime (s) ").grid(row=3)
+    tk.Label(root, text="                ").grid(row=0,column=2)
+    tk.Label(root, text="                ").grid(row=1,column=2)
+    tk.Label(root, text="                ").grid(row=2,column=2)
+    tk.Label(root, text="                ").grid(row=3,column=2)
+    tk.Label(root, text="PID Gains").grid(row=0,column=4)
+    tk.Label(root, text="Kp").grid(row=1,column=3)
+    tk.Label(root, text="Ki").grid(row=2,column=3)
+    tk.Label(root, text="Kd").grid(row=3,column=3)
 
-tK = tk.Entry(root,width=8)
-ttau = tk.Entry(root,width=8)
-tdt= tk.Entry(root,width=8)
-tKp = tk.Entry(root,width=8)
-tKi = tk.Entry(root,width=8)
-tKd= tk.Entry(root,width=8)
+    tK = tk.Entry(root,width=8)
+    ttau = tk.Entry(root,width=8)
+    tdt= tk.Entry(root,width=8)
+    tKp = tk.Entry(root,width=8)
+    tKi = tk.Entry(root,width=8)
+    tKd= tk.Entry(root,width=8)
 
-tK.insert(10, "2.25")
-ttau.insert(10, "60.5")
-tdt.insert(10, "9.99")
-tKp.insert(10, "1.1")
-tKi.insert(10, "0.1")
-tKd.insert(10, "0.09")
+    tK.insert(10, "2.25")
+    ttau.insert(10, "60.5")
+    tdt.insert(10, "9.99")
+    tKp.insert(10, "1.1")
+    tKi.insert(10, "0.1")
+    tKd.insert(10, "0.09")
 
-tK.grid(row=1, column=1)
-ttau.grid(row=2, column=1)
-tdt.grid(row=3, column=1)
-tKp.grid(row=1, column=4)
-tKi.grid(row=2, column=4)
-tKd.grid(row=3, column=4)
+    tK.grid(row=1, column=1)
+    ttau.grid(row=2, column=1)
+    tdt.grid(row=3, column=1)
+    tKp.grid(row=1, column=4)
+    tKi.grid(row=2, column=4)
+    tKd.grid(row=3, column=4)
 
-button_calc = tk.Button(root, text="Refresh", command=refresh)
-tk.Label(root, text="itae:").grid(row=5,column=3)
-itae_text = tk.StringVar()
-tk.Label(root, textvariable=itae_text).grid(row=5,column=4)
+    button_calc = tk.Button(root, text="Refresh", command=refresh)
+    tk.Label(root, text="itae:").grid(row=5,column=3)
+    itae_text = tk.StringVar()
+    tk.Label(root, textvariable=itae_text).grid(row=5,column=4)
 
-button_calc.grid(row=5,column=0)
+    button_calc.grid(row=5,column=0)
 
-root.mainloop()
+    root.mainloop()
