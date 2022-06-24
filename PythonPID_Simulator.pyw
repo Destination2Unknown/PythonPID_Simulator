@@ -113,12 +113,14 @@ class PID(object):
 
 class FOPDTModel(object):    
     def __init__(self, PlantParams, ModelData):                
-        self.t,self.CV = PlantParams
+        self.CV = PlantParams
         self.Gain, self.TimeConstant, self.DeadTime, self.Bias = ModelData
 
     def calc(self,PV,ts):                       
         if (ts-self.DeadTime) <= 0:
             um=0
+        elif int(ts-self.DeadTime)>=len(self.CV):
+            um=self.CV[-1]
         else:
             um=self.CV[int(ts-self.DeadTime)]
         dydt = (-(PV-self.Bias) + self.Gain * um)/self.TimeConstant
@@ -162,7 +164,6 @@ def refresh():
     #Packup data
     PIDGains=(ikp,iki,ikd)
     ModelData=(igain,itau,ideadtime,ibias)
-    PlantParams=(t, CV)
 
     #PID Instantiation
     pid = PID(ikp, iki, ikd, SP[0])
@@ -170,7 +171,7 @@ def refresh():
     pid.tunings=(PIDGains)
 
     #plant Instantiation
-    plant=FOPDTModel(PlantParams, ModelData)
+    plant=FOPDTModel(CV, ModelData)
 
     #Start Value
     PV[0]=ibias+noise[0]
@@ -188,7 +189,7 @@ def refresh():
             CV[i]=pid(PV[i], SP[i])               
             ts = [t[i],t[i+1]]
             #Send step data
-            plant.t,plant.CV=i,CV
+            plant.CV=CV
             #Find calculated PV
             PV[i+1] = plant.update(PV[i],ts)
             PV[i+1]+=noise[i]
