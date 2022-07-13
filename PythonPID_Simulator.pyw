@@ -136,12 +136,12 @@ def refresh():
     ikp,iki,ikd = float(tKp.get()),float(tKi.get()),float(tKd.get())
         
     #Find the size of the range needed
-    if (ideadtime+itau)*4 < minsize:
+    if (ideadtime+itau)*6 < minsize:
      rangesize = minsize
-    elif (ideadtime+itau)*4 >maxsize:
+    elif (ideadtime+itau)*6 >maxsize:
      rangesize = maxsize
     else:
-     rangesize = int((ideadtime+itau)*4)
+     rangesize = int((ideadtime+itau)*6)
 
     #setup time intervals
     t = np.arange(start=0, stop=rangesize, step=1)
@@ -180,7 +180,7 @@ def refresh():
     for i in t:        
         if i<len(t)-1:            
             if i < startofstep:
-                SP[i] = 0
+                SP[i] = ibias
             elif i< rangesize*0.6:
                 SP[i]= 60 + ibias
             else:
@@ -227,11 +227,11 @@ def refresh():
     plt.show()
 
 if __name__ == "__main__":
-    #Random Noise between -0.5 and 0.5, same set used for each run. Created once at runtime.
+    #Random Noise between -0.1 and 0.1, same set used for each run. Created once at runtime.
     minsize=600
     maxsize=7200
-    noise= np.random.rand(minsize)
-    noise-=0.5
+    noise= np.random.rand(minsize)/5
+    noise-=0.1
 
     #Gui
     root = tk.Tk()
@@ -254,20 +254,23 @@ if __name__ == "__main__":
     tk.Label(root, text="Ki").grid(row=2,column=3)
     tk.Label(root, text="Kd").grid(row=3,column=3)
 
+    #Entry Boxes
     tK = tk.Entry(root,width=8)
     ttau = tk.Entry(root,width=8)
     tdt= tk.Entry(root,width=8)
     tKp = tk.Entry(root,width=8)
     tKi = tk.Entry(root,width=8)
     tKd= tk.Entry(root,width=8)
-
+    
+    #Defaults
     tK.insert(10, "2.25")
     ttau.insert(10, "60.5")
     tdt.insert(10, "9.99")
     tKp.insert(10, "1.1")
     tKi.insert(10, "0.1")
     tKd.insert(10, "0.09")
-
+    
+    #Placement
     tK.grid(row=1, column=1)
     ttau.grid(row=2, column=1)
     tdt.grid(row=3, column=1)
@@ -275,11 +278,11 @@ if __name__ == "__main__":
     tKi.grid(row=2, column=4)
     tKd.grid(row=3, column=4)
 
+    #Buttons
     button_calc = tk.Button(root, text="Refresh", command=refresh)
     tk.Label(root, text="itae:").grid(row=5,column=3)
     itae_text = tk.StringVar()
     tk.Label(root, textvariable=itae_text).grid(row=5,column=4)
-
     button_calc.grid(row=5,column=0)
 
     root.mainloop()
