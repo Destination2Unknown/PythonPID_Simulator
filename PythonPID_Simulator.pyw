@@ -229,8 +229,8 @@ def refresh():
 if __name__ == "__main__":
     #Random Noise between -0.25 and 0.25, same set used for each run. Created once at runtime.
     minsize=600
-    maxsize=7200
-    noise= np.random.rand(minsize)/2
+    maxsize=18000
+    noise= np.random.rand(maxsize)/2
     noise-=0.25
 
     #Gui
