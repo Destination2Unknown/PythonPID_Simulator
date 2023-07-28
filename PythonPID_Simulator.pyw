@@ -167,9 +167,6 @@ class PID_Controller(object):
 class FOPDT_Model(object):
     """
     First Order Plus Dead Time (FOPDT) Model.
-
-    Attributes:
-        work_CV (list): A list to store the control values (CV) used during the simulation.
     """
 
     def __init__(self):
@@ -181,22 +178,12 @@ class FOPDT_Model(object):
     def change_params(self, data):
         """
         Update the model parameters with new values.
-
-        Args:
-            data (tuple): A tuple containing the Gain, Time_Constant, Dead_Time, and Bias.
         """
         self.Gain, self.Time_Constant, self.Dead_Time, self.Bias = data
 
     def _calc(self, work_PV, ts):
         """
         Calculate the change in the process variable (PV) over time.
-
-        Args:
-            work_PV (float): The process variable (PV) at the current time step.
-            ts (float): The current time.
-
-        Returns:
-            float: The change in the process variable (PV) over time.
         """
         if (ts - self.Dead_Time) <= 0:
             um = 0
@@ -210,13 +197,6 @@ class FOPDT_Model(object):
     def update(self, work_PV, ts):
         """
         Update the process variable (PV) using the FOPDT model.
-
-        Args:
-            work_PV (float): The process variable (PV) at the current time step.
-            ts (array): The time array over which to perform the simulation.
-
-        Returns:
-            float: The updated process variable (PV) at the final time step.
         """
         y = odeint(self._calc, work_PV, ts)
         return y[-1]
@@ -235,7 +215,7 @@ class App(object):
         Initialize the PID Simulator application.
         """
         self.root = ttk.Window()
-        self.root.title("Python PID Simulator")
+        self.root.title("Python PID Simulator - PID Tuning Ireland©")
         self.root.state("zoomed")
         # Adjust theme to suit
         style = ttk.Style(theme="yeti")
