@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
    
 """
+
 import io
 import matplotlib.pyplot as plt
 import numpy as np
@@ -202,7 +203,7 @@ class FOPDT_Model(object):
         return y[-1]
 
 
-class App(object):
+class PID_Simulator(object):
     """
     Python PID Simulator Application.
 
@@ -214,6 +215,7 @@ class App(object):
         """
         Initialize the PID Simulator application.
         """
+        plt.style.use("bmh")
         self.root = ttk.Window()
         self.root.title("Python PID Simulator - PID Tuning Ireland©")
         self.root.state("zoomed")
@@ -272,11 +274,11 @@ class App(object):
         ttk.Spinbox(self.right_frame, from_=1.00, to=1000.00, increment=0.1, textvariable=self.model_dt, width=15).grid(row=3, column=1, padx=10, pady=10)
         ttk.Spinbox(self.right_frame, from_=-1000.00, to=1000.00, increment=0.1, textvariable=self.model_bias, width=15).grid(row=4, column=1, padx=10, pady=10)
 
-        # Random noise between -0.25 and 0.25, same set used for each run as it's created once at runtime.
+        # Random noise between -0.2 and 0.2, same set used for each run as it's created once at runtime.
         self.minsize = 300
         self.maxsize = 18000
-        self.noise = np.random.rand(self.maxsize) / 2
-        self.noise -= 0.25
+        self.noise = np.random.uniform(-0.2, 0.2, self.maxsize)
+
         # PID and Process Instantiation
         self.pid = PID_Controller()
         self.process_model = FOPDT_Model()
@@ -383,6 +385,5 @@ class App(object):
 
 
 if __name__ == "__main__":
-    plt.style.use("bmh")
-    gui = App()
+    gui = PID_Simulator()
     gui.root.mainloop()
