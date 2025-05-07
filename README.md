@@ -15,5 +15,3 @@
 
 
 ---
-
-Windows Exe: [PID Simulator](https://github.com/Destination2Unknown/PythonPID_Simulator/releases)
