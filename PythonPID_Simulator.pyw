@@ -217,7 +217,7 @@ class PID_Simulator(object):
         """
         plt.style.use("bmh")
         self.root = ttk.Window()
-        self.root.title("Python PID Simulator - PID Tuning Ireland©")
+        self.root.title("Python PID Simulator")
         self.root.state("zoomed")
         # Adjust theme to suit
         style = ttk.Style(theme="yeti")
