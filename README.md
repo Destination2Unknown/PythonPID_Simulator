@@ -1,4 +1,4 @@
-# PythonPID_Simulator :ireland:
+# PythonPID_Simulator
 
 **Direct action:**
 
